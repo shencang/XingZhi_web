@@ -13,9 +13,26 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path
+from django.urls import include
+from django.views.static import serve
+
+from XingZhiServer import views
+from xingzhi import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    url('admin/', admin.site.urls),
+    url(r'', include('XingZhiServer.urls', namespace='XingZhiServer')),
+    url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    url(r'loginE/$', views.login_email),  # 邮箱登录
+    url(r'login/$', views.login),
+    url(r'register/$', views.register),
+    url(r'findProject/$', views.user_project),
+    url(r'findLabel/$', views.user_label),
+    url(r'findTask/$', views.user_task),
+    url(r'findTaskLabels/$', views.task_label),
+    url(r'findTaskLabels/$', views.label_task),
+
 ]

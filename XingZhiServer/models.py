@@ -15,6 +15,7 @@ class Users(models.Model):
     userPassword = models.CharField(max_length=100)  # 密码
     userPhone = models.CharField(max_length=12)  # 手机号
     userIdentity = models.CharField(max_length=2)  # 用户身份
+    userSex = models.CharField(max_length=1)  # 用户性别
     userAvatar = models.FileField(upload_to='media', null=False)  # 用户头像
     userSignature = models.CharField(max_length=100)  # 用户个性签名
 
@@ -32,6 +33,7 @@ class Projects(models.Model):
     projectName = models.TextField()  # 项目名字
     projectColorName = models.TextField()  # 项目标题颜色
     projectColorCode = models.IntegerField()  # 项目颜色代码
+    projectUser = models.ForeignKey(Users, on_delete=models.CASCADE)  # 任务所属用户，外键
 
     def __self__(self):
         return self.projectId
@@ -47,6 +49,7 @@ class Labels(models.Model):
     labelName = models.TextField()  # 标签名字
     labelColorName = models.TextField()  # 标签标题颜色
     labelColorCode = models.IntegerField()  # 标签颜色代码
+    labelUser = models.ForeignKey(Users, on_delete=models.CASCADE)  # 标签所属用户，外键
 
     def __self__(self):
         return self.labelId
@@ -63,8 +66,8 @@ class Tasks(models.Model):
     taskComment = models.TextField()  # 任务评论
     taskDueDate = models.IntegerField()  # 任务截止时间
     taskPriority = models.IntegerField()  # 任务优先级
-    taskProjectId = models.IntegerField()  # 任务所属项目ID,外键
-    taskUserId = models.IntegerField()  # 任务所属用户ID,外键
+    taskProjectId = models.ForeignKey(Projects, on_delete=models.CASCADE)  # 任务所属项目ID,外键
+    taskUserId = models.ForeignKey(Users, on_delete=models.CASCADE)  # 任务所属用户ID,外键
     taskStatus = models.IntegerField()  # 任务状态
 
     def __self__(self):
@@ -78,36 +81,8 @@ class Tasks(models.Model):
 
 class TaskLabels(models.Model):
     taskLabelId = models.AutoField(primary_key=True)  # 任务标签关系表ID
-    taskId = models.IntegerField()  # 任务ID，外键
-    labelId = models.IntegerField()  # 标签ID，外键
+    taskId = models.ForeignKey(Tasks,on_delete=models.CASCADE) # 任务ID，外键
+    labelId = models.ForeignKey(Labels,on_delete=models.CASCADE)  # 标签ID，外键
 
     def __self__(self):
         return self.taskLabelId
-
-
-'''
-用户项目关系表
-'''
-
-
-class UserProject(models.Model):
-    userProjectId = models.AutoField(primary_key=True)  # 用户项目关系表ID
-    userId = models.IntegerField()  # 用户ID，外键
-    projectId = models.IntegerField()  # 项目ID，外键
-
-    def __self(self):
-        return self.userProjectId
-
-
-'''
-用户标签关系表
-'''
-
-
-class UserLabels(models.Model):
-    userLabel = models.IntegerField(primary_key=True)  # 用户标签关系表ID
-    userId = models.IntegerField()  # 用户id外键
-    labelId = models.IntegerField()  # 标签id外键
-
-    def __self__(self):
-        return self.userLabel
