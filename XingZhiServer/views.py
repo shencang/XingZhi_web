@@ -238,3 +238,22 @@ def label_task(request):
             else:
                 resp = {'projectsId': '查询无结果','id': '0'}
                 return HttpResponse(json.dumps(resp))
+
+@csrf_exempt
+def add_project(request):
+    if request.method == 'POST':
+        user = request.POST.get('userId')  # 用户id
+        project_name =request.POST.get('projectName')
+        project_colorname =request.POST.get('projectColorName')
+        project_colorcode =request.POST.get('projectColorCode')
+        project = models.Projects.objects.create(projectName=project_name,
+                                                 project_colorname=project_colorname,
+                                                 projectColorCode=project_colorcode,
+                                                 projectUser=user)
+        project.save()
+        resp = {'message': '添加项目成功', 'id': '0'}
+        return HttpResponse(json.dumps(resp))
+    else:
+        resp = {'message': '添加项目失败', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
+    
