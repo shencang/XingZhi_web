@@ -132,24 +132,11 @@ def login(request):
             return HttpResponse(json.dumps(resp))
 
 
-# @csrf_exempt
-# def hqz(request):
-#     user_id = request.GET.get('userId')
-#     if request.method == 'POST':
-#         avatar = request.FILES.get('avatar')  # 头像，通过39.105.110.19/media/media/图片名访问头像
-#         user = models.Users.objects.create(Image=avatar)
-#         user.save()
-#
-#         return HttpResponse('上传成功')
-#     else:
-#         return HttpResponse('上传失败')
-
-
 @csrf_exempt
 def user_task(request):
     user_id = request.GET.get('userId')
     if request.method == 'POST':
-        tasks = Tasks.objects.filter(userId=user_id)
+        tasks = Tasks.objects.filter(taskUserId=user_id)
         tasks_result = []
         if tasks:
             for i in tasks:
@@ -168,7 +155,7 @@ def user_task(request):
 def user_project(request):
     user_id = request.GET.get('userId')
     if request.method == 'POST':
-        projects = Projects.objects.filter(userId=user_id)
+        projects = Projects.objects.filter(projectUser=user_id)
         projects_result = []
         if projects:
             for i in projects:
@@ -179,7 +166,7 @@ def user_project(request):
                 projects_result.append(resp)
                 return HttpResponse(json.dumps(projects_result))
             else:
-                resp = {'projectsId': '查询无结果','id': '0'}
+                resp = {'projectsId': '查询无结果', 'id': '0'}
                 return HttpResponse(json.dumps(resp))
 
 
@@ -187,7 +174,7 @@ def user_project(request):
 def user_label(request):
     user_id = request.GET.get('userId')
     if request.method == 'POST':
-        labels = Labels.objects.filter(userId=user_id)
+        labels = Labels.objects.filter(labelUser=user_id)
         labels_result = []
         if labels:
             for i in labels:
@@ -198,7 +185,7 @@ def user_label(request):
                 labels_result.append(resp)
                 return HttpResponse(json.dumps(labels_result))
             else:
-                resp = {'projectsId': '查询无结果','id': '0'}
+                resp = {'projectsId': '查询无结果', 'id': '0'}
                 return HttpResponse(json.dumps(resp))
 
 
@@ -217,7 +204,7 @@ def task_label(request):
                 labels_result.append(resp)
                 return HttpResponse(json.dumps(labels_result))
             else:
-                resp = {'taskLabelId': '查询无结果','id': '0'}
+                resp = {'taskLabelId': '查询无结果', 'id': '0'}
                 return HttpResponse(json.dumps(resp))
 
 
@@ -236,23 +223,98 @@ def label_task(request):
                 tasks_result.append(resp)
                 return HttpResponse(json.dumps(tasks_result))
             else:
-                resp = {'taskLabelId': '查询无结果','id': '0'}
+                resp = {'taskLabelId': '查询无结果', 'id': '0'}
                 return HttpResponse(json.dumps(resp))
+
 
 @csrf_exempt
 def add_project(request):
     if request.method == 'POST':
         user = request.POST.get('userId')  # 用户id
-        project_name =request.POST.get('projectName')
-        project_colorname =request.POST.get('projectColorName')
-        project_colorcode =request.POST.get('projectColorCode')
+        user_f = Users.objects.get(userId=user)
+        project_name = request.POST.get('projectName')
+        project_colorname = request.POST.get('projectColorName')
+        project_colorcode = request.POST.get('projectColorCode')
         project = models.Projects.objects.create(projectName=project_name,
-                                                 project_colorname=project_colorname,
+                                                 projectColorName=project_colorname,
                                                  projectColorCode=project_colorcode,
-                                                 projectUser=user)
+                                                 projectUser=user_f)
         project.save()
         resp = {'message': '添加项目成功', 'id': '0'}
         return HttpResponse(json.dumps(resp))
     else:
         resp = {'message': '添加项目失败', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def add_label(request):
+    if request.method == 'POST':
+        user = int(request.POST.get('userId'))  # 用户id
+        user_f = Users.objects.get(userId=user)
+        label_name = request.POST.get('labelName')
+        label_colorname = request.POST.get('labelColorName')
+        label_colorcode = request.POST.get('labelColorCode')
+        label = models.Labels.objects.create(labelName=label_name,
+                                             labelColorName=label_colorname,
+                                             labelColorCode=label_colorcode,
+                                             labelUser=user_f)
+        label.save()
+        resp = {'message': '添加标签成功', 'id': '0'}
+        return HttpResponse(json.dumps(resp))
+    else:
+        resp = {'message': '添加标签失败', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def add_task(request):
+    if request.method == 'POST':
+        user = request.POST.get('userId')  # 用户id
+        user_f = Users.objects.get(userId=user)
+        task_title = request.POST.get('taskTitle')
+        task_comment = request.POST.get('taskComment')
+        task_duedate = request.POST.get('taskDueDate')
+        task_priority = request.POST.get('taskPriority')
+        task_prjojectid = request.POST.get('taskProjectId')
+        # task_user = request.POST.get('taskUserId')
+        task_status = request.POST.get('taskStatus')
+        task = models.Tasks.objects.create(
+            taskTitle=task_title, taskComment=task_comment, task_DueDate=task_duedate,
+            taskPriority=task_priority, taskPrjojectId=task_prjojectid, taskUserId=user_f,
+            taskStatus=task_status)
+        task.save()
+        resp = {'message': '添加任务成功', 'id': '0'}
+        return HttpResponse(json.dumps(resp))
+    else:
+        resp = {'message': '添加任务失败', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def add_relation_task_label(request):
+    if request.method == 'POST':
+        user = request.POST.get('userId')  # 用户id
+        user_f = Users.objects.get(userId=user)
+        taskid = request.POST.get('taskId')
+        labelid = request.POST.get('labelId')
+        task = Tasks.objects.filter(taskId=taskid, taskUserId=user)
+        label = Labels.objects.filter(labelId=labelid, labelUser=user)
+        if task:
+            if label:
+                task = Tasks.objects.get(taskId=taskid)
+                label = Labels.objects.get(labelid=labelid)
+                task_label_add = models.TaskLabels.objects.create(
+                    taskId=task, labelId=label)
+                task_label_add.save()
+                resp = {'message': '添加关系成功', 'id': '0'}
+                return HttpResponse(json.dumps(resp))
+            else:
+                resp = {'message': '添加关系失败-不存在label', 'id': '2'}
+                return HttpResponse(json.dumps(resp))
+        else:
+            resp = {'message': '添加关系失败-不存在task', 'id': '3'}
+            return HttpResponse(json.dumps(resp))
+    else:
+        resp = {'message': '添加关系失败', 'id': '1'}
         return HttpResponse(json.dumps(resp))

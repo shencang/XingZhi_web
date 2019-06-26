@@ -33,10 +33,10 @@ class Projects(models.Model):
     projectName = models.TextField()  # 项目名字
     projectColorName = models.TextField()  # 项目标题颜色
     projectColorCode = models.IntegerField()  # 项目颜色代码
-    projectUser = models.ForeignKey(Users, on_delete=models.CASCADE)  # 任务所属用户，外键
+    projectUser = models.ForeignKey(Users, on_delete=models.CASCADE, null=False)  # 任务所属用户，外键
 
-    def __self__(self):
-        return self.projectId
+    def __str__(self):
+        return str(self.projectUser)+'-'+str(self.projectName)
 
 
 '''
@@ -49,10 +49,10 @@ class Labels(models.Model):
     labelName = models.TextField()  # 标签名字
     labelColorName = models.TextField()  # 标签标题颜色
     labelColorCode = models.IntegerField()  # 标签颜色代码
-    labelUser = models.ForeignKey(Users, on_delete=models.CASCADE)  # 标签所属用户，外键
+    labelUser = models.ForeignKey(Users, on_delete=models.CASCADE, null=False)  # 标签所属用户，外键
 
-    def __self__(self):
-        return self.labelId
+    def __str__(self):
+        return str(self.labelUser)+ '-'+str(self.labelName)
 
 
 '''
@@ -66,12 +66,12 @@ class Tasks(models.Model):
     taskComment = models.TextField()  # 任务评论
     taskDueDate = models.IntegerField()  # 任务截止时间
     taskPriority = models.IntegerField()  # 任务优先级
-    taskProjectId = models.ForeignKey(Projects, on_delete=models.CASCADE)  # 任务所属项目ID,外键
-    taskUserId = models.ForeignKey(Users, on_delete=models.CASCADE)  # 任务所属用户ID,外键
+    taskProjectId = models.ForeignKey(Projects, on_delete=models.CASCADE, null=False)  # 任务所属项目ID,外键
+    taskUserId = models.ForeignKey(Users, on_delete=models.CASCADE, null=False)  # 任务所属用户ID,外键
     taskStatus = models.IntegerField()  # 任务状态
 
-    def __self__(self):
-        return self.taskId
+    def __str__(self):
+        return str(self.taskUserId)+ '-'+ str(self.taskTitles)
 
 
 '''
@@ -81,8 +81,8 @@ class Tasks(models.Model):
 
 class TaskLabels(models.Model):
     taskLabelId = models.AutoField(primary_key=True)  # 任务标签关系表ID
-    taskId = models.ForeignKey(Tasks,on_delete=models.CASCADE) # 任务ID，外键
-    labelId = models.ForeignKey(Labels,on_delete=models.CASCADE)  # 标签ID，外键
+    taskId = models.ForeignKey(Tasks, on_delete=models.CASCADE, null=False)  # 任务ID，外键
+    labelId = models.ForeignKey(Labels, on_delete=models.CASCADE, null=False)  # 标签ID，外键
 
-    def __self__(self):
-        return self.taskLabelId
+    def __str__(self):
+        return str(self.taskId)+ '-'+ str(self.labelId)

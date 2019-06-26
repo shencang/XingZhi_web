@@ -34,5 +34,9 @@ urlpatterns = [
     url(r'findTask/$', views.user_task),
     url(r'findTaskLabels/$', views.task_label),
     url(r'findTaskLabels/$', views.label_task),
+    url(r'addtask/',views.add_task),
+    url(r'addrelation/$',views.add_relation_task_label),
+    url(r'addlabel/$',views.add_label),
+    url(r'addproject/$',views.add_project),
 
 ]
