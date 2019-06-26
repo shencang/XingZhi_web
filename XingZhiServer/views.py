@@ -217,7 +217,7 @@ def task_label(request):
                 labels_result.append(resp)
                 return HttpResponse(json.dumps(labels_result))
             else:
-                resp = {'projectsId': '查询无结果','id': '0'}
+                resp = {'taskLabelId': '查询无结果','id': '0'}
                 return HttpResponse(json.dumps(resp))
 
 
@@ -236,7 +236,7 @@ def label_task(request):
                 tasks_result.append(resp)
                 return HttpResponse(json.dumps(tasks_result))
             else:
-                resp = {'projectsId': '查询无结果','id': '0'}
+                resp = {'taskLabelId': '查询无结果','id': '0'}
                 return HttpResponse(json.dumps(resp))
 
 @csrf_exempt
@@ -256,4 +256,3 @@ def add_project(request):
     else:
         resp = {'message': '添加项目失败', 'id': '1'}
         return HttpResponse(json.dumps(resp))
-    

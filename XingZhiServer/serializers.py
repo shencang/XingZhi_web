@@ -32,7 +32,7 @@ class LabelSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
-        fields = ('taskId', 'taskTitles', 'taskComment', 'taskComment',
+        fields = ('taskId', 'taskTitles', 'taskComment',
                   'taskDueDate', 'taskPriority', 'taskProjectId',
                   'taskUserId', 'taskStatus')
 
