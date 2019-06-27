@@ -134,46 +134,49 @@ def login(request):
 
 @csrf_exempt
 def user_task(request):
-    user_id = request.GET.get('userId')
     if request.method == 'POST':
+        user_id = request.POST.get('userId')
         tasks = Tasks.objects.filter(taskUserId=user_id)
         tasks_result = []
         if tasks:
             for i in tasks:
                 resp = {'taskId': i.taskId, 'taskTitles': i.taskTitles,
                         'taskComment': i.taskComment, 'taskDueDate': i.taskDueDate,
-                        'taskPriority': i.taskPriority, 'taskProjectId': i.taskProjectId,
+                        'taskPriority': i.taskPriority, 'taskProjectId': i.taskProjectId.projectId,
                         'taskUserId': user_id, 'taskStatus': i.taskStatus}
                 tasks_result.append(resp)
-                return HttpResponse(json.dumps(tasks_result))
-            else:
-                resp = {'taskId': '查询无结果', 'id': '0'}
-                return HttpResponse(json.dumps(resp))
+            print(tasks_result)
+            return HttpResponse(json.dumps(tasks_result))
+        else:
+            resp = {'taskId': '查询无结果', 'id': '1'}
+            return HttpResponse(json.dumps(resp))
 
 
 @csrf_exempt
 def user_project(request):
-    user_id = request.GET.get('userId')
     if request.method == 'POST':
+        user_id = request.POST.get('userId')
         projects = Projects.objects.filter(projectUser=user_id)
+        print(projects)
         projects_result = []
         if projects:
             for i in projects:
-                resp = {'projectsId': i.taskUserId, 'projectName': i.projectName,
+                resp = {'projectsId': i.projectId, 'projectName': i.projectName,
                         'projectColorName': i.projectColorName,
                         'projectColorCode': i.projectColorCode, 'projectUser': user_id
                         }
                 projects_result.append(resp)
-                return HttpResponse(json.dumps(projects_result))
-            else:
-                resp = {'projectsId': '查询无结果', 'id': '0'}
-                return HttpResponse(json.dumps(resp))
+            print(projects_result)
+            return HttpResponse(json.dumps(projects_result))
+        else:
+            resp = {'projectsId': '查询无结果', 'id': '1'}
+            return HttpResponse(json.dumps(resp))
 
 
 @csrf_exempt
 def user_label(request):
-    user_id = request.GET.get('userId')
     if request.method == 'POST':
+        user_id = request.POST.get('userId')
         labels = Labels.objects.filter(labelUser=user_id)
         labels_result = []
         if labels:
@@ -183,48 +186,49 @@ def user_label(request):
                         'labelColorCode': i.labelColorCode, 'labelUser': user_id
                         }
                 labels_result.append(resp)
-                return HttpResponse(json.dumps(labels_result))
-            else:
-                resp = {'projectsId': '查询无结果', 'id': '0'}
-                return HttpResponse(json.dumps(resp))
+            return HttpResponse(json.dumps(labels_result))
+        else:
+            resp = {'projectsId': '查询无结果', 'id': '1'}
+            return HttpResponse(json.dumps(resp))
 
 
 @csrf_exempt
 def task_label(request):
-    task_id = request.GET.get('taskId')
     if request.method == 'POST':
+        task_id = request.POST.get('taskId')
         labels = TaskLabels.objects.filter(taskId=task_id)
+        print(labels)
         labels_result = []
         if labels:
             for i in labels:
                 resp = {'taskLabelId': i.taskLabelId,
                         'taskId': task_id,
-                        'labelId': i.labelId
+                        'labelId': i.labelId.labelId
                         }
                 labels_result.append(resp)
-                return HttpResponse(json.dumps(labels_result))
-            else:
-                resp = {'taskLabelId': '查询无结果', 'id': '0'}
-                return HttpResponse(json.dumps(resp))
+            return HttpResponse(json.dumps(labels_result))
+        else:
+            resp = {'taskLabelId': '查询无结果', 'id': '1'}
+            return HttpResponse(json.dumps(resp))
 
 
 @csrf_exempt
 def label_task(request):
-    label_id = request.GET.get('labelId')
     if request.method == 'POST':
+        label_id = request.POST.get('labelId')
         tasks = TaskLabels.objects.filter(labelId=label_id)
         tasks_result = []
         if tasks:
             for i in tasks:
                 resp = {'taskLabelId': i.taskLabelId,
-                        'taskId': i.taskId,
+                        'taskId': i.taskId.taskId,
                         'labelId': label_id
                         }
                 tasks_result.append(resp)
-                return HttpResponse(json.dumps(tasks_result))
-            else:
-                resp = {'taskLabelId': '查询无结果', 'id': '0'}
-                return HttpResponse(json.dumps(resp))
+            return HttpResponse(json.dumps(tasks_result))
+        else:
+            resp = {'taskLabelId': '查询无结果', 'id': '1'}
+            return HttpResponse(json.dumps(resp))
 
 
 @csrf_exempt
@@ -295,7 +299,6 @@ def add_task(request):
 def add_relation_task_label(request):
     if request.method == 'POST':
         user = request.POST.get('userId')  # 用户id
-        user_f = Users.objects.get(userId=user)
         taskid = request.POST.get('taskId')
         labelid = request.POST.get('labelId')
         task = Tasks.objects.filter(taskId=taskid, taskUserId=user)
@@ -303,7 +306,7 @@ def add_relation_task_label(request):
         if task:
             if label:
                 task = Tasks.objects.get(taskId=taskid)
-                label = Labels.objects.get(labelid=labelid)
+                label = Labels.objects.get(labelId=labelid)
                 task_label_add = models.TaskLabels.objects.create(
                     taskId=task, labelId=label)
                 task_label_add.save()
@@ -318,3 +321,166 @@ def add_relation_task_label(request):
     else:
         resp = {'message': '添加关系失败', 'id': '1'}
         return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def update_user(request):
+    if request.method == 'POST':
+        result = []
+        user_id = request.POST.get('userId')  # id无需创建
+        email = request.POST.get('userEmail')  # 电子邮件
+        name = request.POST.get('username')  # 用户名
+        password = request.POST.get('userPassword')  # 密码
+        phone = request.POST.get('userPhone')  # 电话
+        identity = request.POST.get('userIdentity')  # 身份
+        sex = request.POST.get('userSex')  # 性别
+        avatar = request.FILES.get('userAvatar')  # 头像，通过127.0.0.1:8000/media/图片名访问头像
+        signature = request.POST.get('userSignature')  # 个性签名
+
+        if email:
+            Users.objects.filter(userId=user_id).update(userEmail=email)
+            result.append('email')
+        if name:
+            Users.objects.filter(userId=user_id).update(username=name)
+            result.append('name')
+        if password:
+            Users.objects.filter(userId=user_id).update(userPassword=password)
+            result.append('password')
+        if phone:
+            Users.objects.filter(userId=user_id).update(userPhone=phone)
+            result.append('phone')
+        if identity:
+            Users.objects.filter(userId=user_id).update(userIdentity=identity)
+            result.append('identity')
+        if sex:
+            Users.objects.filter(userId=user_id).update(userSex=sex)
+            result.append('sex')
+        if avatar:
+            Users.objects.filter(userId=user_id).update(userAvatar=avatar)
+            result.append('avatar')
+        if signature:
+            Users.objects.filter(userId=user_id).update(userSignature=signature)
+            result.append('signature')
+
+        if len(result) < 1:
+            resp = {'message': '未修改数据', 'id': '2'}
+        else:
+            temp = '修改('
+            for i in result:
+                temp += i
+                temp += ','
+            temp += ')成功'
+            resp = {'message': temp, 'id': '0'}
+
+        return HttpResponse(json.dumps(resp))
+    else:
+        resp = {'message': '修改失败', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def delete_project(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('projectId')
+        Projects.objects.filter(projectId=project_id).delete()
+        find = Projects.objects.filter(projectId=project_id)
+        if find:
+            resp = {'message': '删除失败', 'id': '1'}
+        else:
+            resp = {'message': '删除成功', 'id': '0'}
+        return HttpResponse(json.dumps(resp))
+    else:
+        resp = {'message': '删除失败', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
+
+
+# @csrf_exempt
+# def update_project(request):
+#
+
+
+@csrf_exempt
+def get_tasks_by_project(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('projectId')
+        task_status = request.POST.get('taskStatus')
+        if task_status:
+            tasks = Tasks.objects.filter(taskProjectId=project_id,taskStatus=task_status)
+        else:
+            tasks = Tasks.objects.filter(taskProjectId=project_id)
+        print(tasks)
+        tasks_result = []
+        if tasks:
+            for i in tasks:
+                resp = {'taskId': i.taskId, 'taskTitles': i.taskTitles,
+                        'taskComment': i.taskComment, 'taskDueDate': i.taskDueDate,
+                        'taskPriority': i.taskPriority, 'taskProjectId': i.taskProjectId.projectId,
+                        'taskUserId': i.taskUserId.userId, 'taskStatus': i.taskStatus}
+                tasks_result.append(resp)
+            return HttpResponse(json.dumps(tasks_result))
+        else:
+            resp = {'taskId': '查询无结果', 'id': '0'}
+            return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def update_task_status(request):
+    if request.method == 'POST':
+        task_id = request.POST.get('taskId')
+        task_status = request.POST.get('taskStatus')
+        if task_id:
+            if task_status:
+                Tasks.objects.filter(taskId=task_id).update(taskStatus=task_status)
+                resp = {'message': '修改成功', 'id': '0'}
+                return HttpResponse(json.dumps(resp))
+            else:
+                resp = {'message': '修改失败,请上传修改的状态参数', 'id': '1'}
+                return HttpResponse(json.dumps(resp))
+        else:
+            resp = {'message': '修改失败，请确认修改id正确', 'id': '2'}
+            return HttpResponse(json.dumps(resp))
+    else:
+        resp = {'message': '修改失败', 'id': '3'}
+        return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def delete_task(request):
+    if request.method == 'POST':
+        task_id = request.POST.get('taskId')
+        Tasks.objects.filter(taskId=task_id).delete()
+        find = Tasks.objects.filter(taskId=task_id)
+        if find:
+            resp = {'message': '删除失败', 'id': '1'}
+        else:
+            resp = {'message': '删除成功', 'id': '0'}
+        return HttpResponse(json.dumps(resp))
+    else:
+        resp = {'message': '删除失败', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def get_tasks_by_label(request):
+    if request.method == 'POST':
+        label_id = request.POST.get('labelId')
+        task_status = request.POST.get('taskStatus')
+        if task_status:
+            tasks = TaskLabels.objects.filter(labelId=label_id)
+            # tasks = Tasks.objects.filter(tasklabelId=label_id,taskStatus=task_status)
+        else:
+            tasks = Tasks.objects.filter(tasklabelId=label_id)
+        print(tasks)
+        tasks_result = []
+        if tasks:
+            for i in tasks:
+                resp = {'taskId': i.taskId, 'taskTitles': i.taskTitles,
+                        'taskComment': i.taskComment, 'taskDueDate': i.taskDueDate,
+                        'taskPriority': i.taskPriority, 'taskProjectId': i.taskProjectId.projectId,
+                        'taskUserId': i.taskUserId.userId, 'taskStatus': i.taskStatus}
+                tasks_result.append(resp)
+            return HttpResponse(json.dumps(tasks_result))
+        else:
+            resp = {'taskId': '查询无结果', 'id': '0'}
+            return HttpResponse(json.dumps(resp))
+

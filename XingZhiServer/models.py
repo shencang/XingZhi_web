@@ -36,7 +36,7 @@ class Projects(models.Model):
     projectUser = models.ForeignKey(Users, on_delete=models.CASCADE, null=False)  # 任务所属用户，外键
 
     def __str__(self):
-        return str(self.projectUser)+'-'+str(self.projectName)
+        return str(self.projectId) + '-' + str(self.projectUser) + '-' + str(self.projectName)
 
 
 '''
@@ -52,7 +52,7 @@ class Labels(models.Model):
     labelUser = models.ForeignKey(Users, on_delete=models.CASCADE, null=False)  # 标签所属用户，外键
 
     def __str__(self):
-        return str(self.labelUser)+ '-'+str(self.labelName)
+        return str(self.labelUser) + '-' + str(self.labelName)
 
 
 '''
@@ -71,7 +71,7 @@ class Tasks(models.Model):
     taskStatus = models.IntegerField()  # 任务状态
 
     def __str__(self):
-        return str(self.taskUserId)+ '-'+ str(self.taskTitles)
+        return str(self.taskUserId) + '-' + str(self.taskTitles)
 
 
 '''
@@ -85,4 +85,4 @@ class TaskLabels(models.Model):
     labelId = models.ForeignKey(Labels, on_delete=models.CASCADE, null=False)  # 标签ID，外键
 
     def __str__(self):
-        return str(self.taskId)+ '-'+ str(self.labelId)
+        return str(self.taskId) + '-' + str(self.labelId)
