@@ -405,7 +405,7 @@ def get_tasks_by_project(request):
         project_id = request.POST.get('projectId')
         task_status = request.POST.get('taskStatus')
         if task_status:
-            tasks = Tasks.objects.filter(taskProjectId=project_id,taskStatus=task_status)
+            tasks = Tasks.objects.filter(taskProjectId=project_id, taskStatus=task_status)
         else:
             tasks = Tasks.objects.filter(taskProjectId=project_id)
         print(tasks)
@@ -463,24 +463,80 @@ def delete_task(request):
 @csrf_exempt
 def get_tasks_by_label(request):
     if request.method == 'POST':
+        user_id = request.POST.get('UserId')
         label_id = request.POST.get('labelId')
+
         task_status = request.POST.get('taskStatus')
         if task_status:
-            tasks = TaskLabels.objects.filter(labelId=label_id)
-            # tasks = Tasks.objects.filter(tasklabelId=label_id,taskStatus=task_status)
+            task_labels = TaskLabels.objects.filter(labelId=label_id)
         else:
-            tasks = Tasks.objects.filter(tasklabelId=label_id)
-        print(tasks)
-        tasks_result = []
-        if tasks:
-            for i in tasks:
-                resp = {'taskId': i.taskId, 'taskTitles': i.taskTitles,
-                        'taskComment': i.taskComment, 'taskDueDate': i.taskDueDate,
-                        'taskPriority': i.taskPriority, 'taskProjectId': i.taskProjectId.projectId,
-                        'taskUserId': i.taskUserId.userId, 'taskStatus': i.taskStatus}
-                tasks_result.append(resp)
-            return HttpResponse(json.dumps(tasks_result))
+            task_labels = TaskLabels.objects.filter(labelId=label_id)
+        print(task_labels)
+        tasks_result_out = []
+        if task_labels:
+            for y in task_labels:
+                print(y.taskId.taskId)
+                print(type(y.taskId.taskId))
+                task = Tasks.objects.get(taskId=y.taskId.taskId)
+                resp = {'taskId': task.taskId, 'taskTitles': task.taskTitles,
+                        'taskComment': task.taskComment, 'taskDueDate': task.taskDueDate,
+                        'taskPriority': task.taskPriority, 'taskProjectId': task.taskProjectId.projectId,
+                        'taskUserId': task.taskUserId.userId, 'taskStatus': task.taskStatus}
+                tasks_result_out.append(resp)
+            return HttpResponse(json.dumps(tasks_result_out))
         else:
             resp = {'taskId': '查询无结果', 'id': '0'}
             return HttpResponse(json.dumps(resp))
 
+
+@csrf_exempt
+def update_task(request):
+    if request.method == 'POST':
+        result = []
+        task_id = request.POST.get('taskId')  # 任务ID
+        task_titles = request.POST.get('taskTitles')  # 任务标题
+        task_comment = request.POST.get('taskComment')  # 任务评论
+        task_duedate = request.POST.get('taskDueDate')  # 任务截止时间
+        task_priority = request.POST.get('taskProjectId')   # 任务优先级
+        task_projectId = request.POST.get('userIdentity')  # 任务所属项目ID,外键
+        task_userId = request.POST.get('taskUserId')  # 任务所属用户ID,外键
+        task_status = request.POST.get('taskStatus')  # 任务状态
+
+        if task_titles:
+            Tasks.objects.filter(taskId=task_id).update(taskTitles = task_titles)
+            result.append('titles')
+        if task_comment:
+            Tasks.objects.filter(taskId=task_id).update(taskComment = task_comment)
+            result.append('comment')
+        if task_duedate:
+            Tasks.objects.filter(taskId=task_id).update(taskDueDate=task_duedate)
+            result.append('duedate')
+        if task_priority:
+            Tasks.objects.filter(taskId=task_id).update(userPhone=task_priority)
+            result.append('priority')
+        if task_projectId:
+            project =Projects.objects.get(projectUser=task_projectId)
+            Tasks.objects.filter(taskId=task_id).update(userIdentity=project)
+            result.append('projectId')
+        if task_userId:
+            user = Users.objects.get(userId=task_userId)
+            Tasks.objects.filter(taskId=task_id).update(taskUserId =user)
+            result.append('userId')
+        if task_status:
+            Users.objects.filter(taskId=task_id).update(taskStatus=task_status)
+            result.append('status')
+
+        if len(result) < 1:
+            resp = {'message': '未修改数据', 'id': '2'}
+        else:
+            temp = '修改('
+            for i in result:
+                temp += i
+                temp += ','
+            temp += ')成功'
+            resp = {'message': temp, 'id': '0'}
+
+        return HttpResponse(json.dumps(resp))
+    else:
+        resp = {'message': '修改失败', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
