@@ -47,6 +47,7 @@ urlpatterns = [
     # 修改方法
     url(r'updateUser/$', views.update_user),
     url(r'updateTaskStatus/$',views.update_task_status),
+    url(r'updateTask/$',views.update_task),
     ################################################################
     # 查找方法
     url(r'findProject/$', views.user_project),
