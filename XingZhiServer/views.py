@@ -497,16 +497,16 @@ def update_task(request):
         task_titles = request.POST.get('taskTitles')  # 任务标题
         task_comment = request.POST.get('taskComment')  # 任务评论
         task_duedate = request.POST.get('taskDueDate')  # 任务截止时间
-        task_priority = request.POST.get('taskProjectId')   # 任务优先级
+        task_priority = request.POST.get('taskProjectId')  # 任务优先级
         task_projectId = request.POST.get('userIdentity')  # 任务所属项目ID,外键
         task_userId = request.POST.get('taskUserId')  # 任务所属用户ID,外键
         task_status = request.POST.get('taskStatus')  # 任务状态
 
         if task_titles:
-            Tasks.objects.filter(taskId=task_id).update(taskTitles = task_titles)
+            Tasks.objects.filter(taskId=task_id).update(taskTitles=task_titles)
             result.append('titles')
         if task_comment:
-            Tasks.objects.filter(taskId=task_id).update(taskComment = task_comment)
+            Tasks.objects.filter(taskId=task_id).update(taskComment=task_comment)
             result.append('comment')
         if task_duedate:
             Tasks.objects.filter(taskId=task_id).update(taskDueDate=task_duedate)
@@ -515,12 +515,12 @@ def update_task(request):
             Tasks.objects.filter(taskId=task_id).update(userPhone=task_priority)
             result.append('priority')
         if task_projectId:
-            project =Projects.objects.get(projectUser=task_projectId)
+            project = Projects.objects.get(projectUser=task_projectId)
             Tasks.objects.filter(taskId=task_id).update(userIdentity=project)
             result.append('projectId')
         if task_userId:
             user = Users.objects.get(userId=task_userId)
-            Tasks.objects.filter(taskId=task_id).update(taskUserId =user)
+            Tasks.objects.filter(taskId=task_id).update(taskUserId=user)
             result.append('userId')
         if task_status:
             Users.objects.filter(taskId=task_id).update(taskStatus=task_status)
@@ -540,3 +540,74 @@ def update_task(request):
     else:
         resp = {'message': '修改失败', 'id': '1'}
         return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def get_user_info(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('userId')
+        user_email = request.POST.get('userEmail')
+        print(user_id,' ',user_email)
+        user = None
+        if user_id is not None:
+            user_f = Users.objects.filter(userId=user_id)
+            if user_f:
+                user = Users.objects.get(userId=user_f[0].userId)
+        if user_email is not None:
+            user_f = Users.objects.filter(userEmail=user_email)
+            if user_f:
+                user = Users.objects.get(userEmail=user_f[0].userEmail)
+        if user:
+            print(user.userAvatar.url)
+            resp = {'userId': user.userId,
+                    'userEmail': user.userEmail,
+                    'username': user.username,
+                    'userPassword': '',
+                    'userPhone': user.userPhone,
+                    'userIdentity': user.userIdentity,
+                    'userSex': user.userSex,
+                    'userAvatar': user.userAvatar.url,
+                    'userSignature': user.userSignature,
+                    }
+            return HttpResponse(json.dumps(resp))
+        else:
+            resp = {'taskId': '查询无结果', 'id': '1'}
+            return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def update_password(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('userId')
+        user_email = request.POST.get('userEmail')
+        user_new_password = request.POST.get('userPassword')
+        user = None
+        if user_id is not None:
+            user_f = Users.objects.filter(userId=user_id)
+            if user_f:
+                user = Users.objects.get(userId=user_f[0].userId)
+        if user_email is not None:
+            user_f = Users.objects.filter(userEmail=user_email)
+            if user_f:
+                user = Users.objects.get(userEmail=user_f[0].userEmail)
+        if user:
+            user.userPassword = user_new_password
+            user.save()
+            resp = {'message': '修改成功', 'id': '0'}
+            return HttpResponse(json.dumps(resp))
+        else:
+            resp = {'taskId': '查询无结果', 'id': '1'}
+            return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def find_email_repeat(request):
+    if request.method == 'POST':
+        reg_email = request.POST.get('userEmail')
+        result = Users.objects.filter(userEmail=reg_email)
+        if result:
+            resp = {'message': '不可注册已经重复', 'id': '1'}
+            return HttpResponse(json.dumps(resp))
+        else:
+            resp = {'message': '可以注册', 'id': '0'}
+            return HttpResponse(json.dumps(resp))

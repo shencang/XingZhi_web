@@ -42,12 +42,12 @@ urlpatterns = [
     ################################################################
     # 删除方法
     url(r'deleteProject/$', views.delete_project),
-    url(r'deleteTask/$',views.delete_task),
+    url(r'deleteTask/$', views.delete_task),
     ################################################################
     # 修改方法
     url(r'updateUser/$', views.update_user),
-    url(r'updateTaskStatus/$',views.update_task_status),
-    url(r'updateTask/$',views.update_task),
+    url(r'updateTaskStatus/$', views.update_task_status),
+    url(r'updateTask/$', views.update_task),
     ################################################################
     # 查找方法
     url(r'findProject/$', views.user_project),
@@ -55,8 +55,12 @@ urlpatterns = [
     url(r'findTask/$', views.user_task),
     url(r'findTaskLabel/$', views.task_label),
     url(r'findLabelTask/$', views.label_task),
-    url(r'getTaskByProject/$',views.get_tasks_by_project),
-    url(r'getTaskByLabel/$',views.get_tasks_by_label),
+    url(r'getTaskByProject/$', views.get_tasks_by_project),
+    url(r'getTaskByLabel/$', views.get_tasks_by_label),
     ################################################################
+    # 新追加。暂不分类
+    url(r'getUserInfo/$', views.get_user_info),
+    url(r'updatePassword/$', views.update_password),
+    url(r'findEmailRepeat/$', views.find_email_repeat),
 
 ]
