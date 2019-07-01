@@ -105,7 +105,7 @@ def login_email(request):
     if request.method == 'POST':
         email = request.POST.get('userEmail')  # 电子邮件
         password = request.POST.get('password')  # 密码
-        # print(username,password)
+        print(email,password)
         users = Users.objects.filter(userEmail=email, userPassword=password)
         # print(users)
         if users:

@@ -32,7 +32,7 @@ class Projects(models.Model):
     projectId = models.AutoField(primary_key=True)  # 项目ID
     projectName = models.TextField()  # 项目名字
     projectColorName = models.TextField()  # 项目标题颜色
-    projectColorCode = models.IntegerField()  # 项目颜色代码
+    projectColorCode = models.BigIntegerField()  # 项目颜色代码
     projectUser = models.ForeignKey(Users, on_delete=models.CASCADE, null=False)  # 任务所属用户，外键
 
     def __str__(self):
@@ -48,7 +48,7 @@ class Labels(models.Model):
     labelId = models.AutoField(primary_key=True)  # 标签ID
     labelName = models.TextField()  # 标签名字
     labelColorName = models.TextField()  # 标签标题颜色
-    labelColorCode = models.IntegerField()  # 标签颜色代码
+    labelColorCode = models.BigIntegerField()  # 标签颜色代码
     labelUser = models.ForeignKey(Users, on_delete=models.CASCADE, null=False)  # 标签所属用户，外键
 
     def __str__(self):
@@ -64,11 +64,11 @@ class Tasks(models.Model):
     taskId = models.AutoField(primary_key=True)  # 任务ID
     taskTitles = models.TextField()  # 任务标题
     taskComment = models.TextField()  # 任务评论
-    taskDueDate = models.IntegerField()  # 任务截止时间
-    taskPriority = models.IntegerField()  # 任务优先级
+    taskDueDate = models.BigIntegerField  # 任务截止时间
+    taskPriority = models.BigIntegerField()  # 任务优先级
     taskProjectId = models.ForeignKey(Projects, on_delete=models.CASCADE, null=False)  # 任务所属项目ID,外键
     taskUserId = models.ForeignKey(Users, on_delete=models.CASCADE, null=False)  # 任务所属用户ID,外键
-    taskStatus = models.IntegerField()  # 任务状态
+    taskStatus = models.BigIntegerField()  # 任务状态
 
     def __str__(self):
         return str(self.taskId)+'-'+str(self.taskUserId) + '-' + str(self.taskTitles)
