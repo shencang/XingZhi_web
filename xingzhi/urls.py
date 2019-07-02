@@ -62,5 +62,8 @@ urlpatterns = [
     url(r'getUserInfo/$', views.get_user_info),
     url(r'updatePassword/$', views.update_password),
     url(r'findEmailRepeat/$', views.find_email_repeat),
+    url(r'findLabelRepeat/$', views.find_label_repeat),
+    url(r'findTaskByDate/$',views.user_task_date),
+    url(r'findTaskByStatus/$',views.user_task_status),
 
 ]

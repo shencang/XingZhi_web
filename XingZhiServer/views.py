@@ -105,7 +105,7 @@ def login_email(request):
     if request.method == 'POST':
         email = request.POST.get('userEmail')  # 电子邮件
         password = request.POST.get('password')  # 密码
-        print(email,password)
+        print(email, password)
         users = Users.objects.filter(userEmail=email, userPassword=password)
         # print(users)
         if users:
@@ -161,7 +161,7 @@ def user_project(request):
         projects_result = []
         if projects:
             for i in projects:
-                resp = {'projectsId': i.projectId, 'projectName': i.projectName,
+                resp = {'projectId': i.projectId, 'projectName': i.projectName,
                         'projectColorName': i.projectColorName,
                         'projectColorCode': i.projectColorCode, 'projectUser': user_id
                         }
@@ -547,7 +547,7 @@ def get_user_info(request):
     if request.method == 'POST':
         user_id = request.POST.get('userId')
         user_email = request.POST.get('userEmail')
-        print(user_id,' ',user_email)
+        print(user_id, ' ', user_email)
         user = None
         if user_id is not None:
             user_f = Users.objects.filter(userId=user_id)
@@ -611,3 +611,62 @@ def find_email_repeat(request):
         else:
             resp = {'message': '可以注册', 'id': '0'}
             return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def find_label_repeat(request):
+    if request.method == 'POST':
+        reg_label = request.POST.get('labelId')
+        result = Labels.objects.filter(labelId=reg_label)
+        if result:
+            resp = {'message': '不可添加已经重复', 'id': '1'}
+            return HttpResponse(json.dumps(resp))
+        else:
+            resp = {'message': '可以添加', 'id': '0'}
+            return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def user_task_date(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('userId')
+        start_date = request.POST.get('startDate')
+        end_date = request.POST.get('endDate')
+        tasks = Tasks.objects.filter(taskUserId=user_id)
+        tasks_result = []
+        if tasks:
+            for i in tasks:
+                if end_date > i.taskDueDate > start_date:
+                    resp = {'taskId': i.taskId, 'taskTitles': i.taskTitles,
+                            'taskComment': i.taskComment, 'taskDueDate': i.taskDueDate,
+                            'taskPriority': i.taskPriority, 'taskProjectId': i.taskProjectId.projectId,
+                            'taskUserId': user_id, 'taskStatus': i.taskStatus}
+                    tasks_result.append(resp)
+        print(tasks_result)
+        return HttpResponse(json.dumps(tasks_result))
+    else:
+        resp = {'taskId': '查询无结果', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def user_task_status(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('userId')
+        status = request.POST.get('taskStatus')
+        tasks = Tasks.objects.filter(taskUserId=user_id, taskStatus=status)
+        tasks_result = []
+        if tasks:
+            for i in tasks:
+                resp = {'taskId': i.taskId, 'taskTitles': i.taskTitles,
+                        'taskComment': i.taskComment, 'taskDueDate': i.taskDueDate,
+                        'taskPriority': i.taskPriority, 'taskProjectId': i.taskProjectId.projectId,
+                        'taskUserId': user_id, 'taskStatus': i.taskStatus}
+                tasks_result.append(resp)
+        print(tasks_result)
+        return HttpResponse(json.dumps(tasks_result))
+    else:
+        resp = {'taskId': '查询无结果', 'id': '1'}
+        return HttpResponse(json.dumps(resp))
+
+
