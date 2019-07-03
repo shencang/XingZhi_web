@@ -9,6 +9,7 @@ from XingZhiServer import models
 from XingZhiServer.models import Users, Projects, Labels, Tasks, TaskLabels
 from XingZhiServer.serializers import UserSerializer, ProjectSerializer, LabelSerializer, TaskSerializer, \
     TaskLabelSerializer
+from xingzhi import settings
 
 '''
 查询数据库中所有的用户
@@ -356,7 +357,15 @@ def update_user(request):
             Users.objects.filter(userId=user_id).update(userSex=sex)
             result.append('sex')
         if avatar:
-            Users.objects.filter(userId=user_id).update(userAvatar=avatar)
+            save_path = '{}/media/{}'.format(settings.MEDIA_ROOT, avatar.name)
+            print(avatar)
+            with open(save_path, 'wb+') as f:
+                for content in avatar.chunks():  # pic.chunks文件内容
+                    f.write(content)
+
+            file = Users.objects.get(userId=user_id).userAvatar.save(avatar.name, avatar, save=True)
+            print('file!')
+            print(file)
             result.append('avatar')
         if signature:
             Users.objects.filter(userId=user_id).update(userSignature=signature)
@@ -668,5 +677,3 @@ def user_task_status(request):
     else:
         resp = {'taskId': '查询无结果', 'id': '1'}
         return HttpResponse(json.dumps(resp))
-
-
