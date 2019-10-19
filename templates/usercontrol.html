@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <meta name="description" content="">
+
+    <meta name="author" content="">
+
+    <link rel="icon" href="../../favicon.ico">
+
+
+    <title>用户管理系统</title>
+
+
+</head>
+
+<body>
+
+
+<div class="container">
+
+    <!-- The justified navigation menu is meant for single line per list item.
+
+         Multiple lines will require custom code not provided by Bootstrap. -->
+
+    <div class="masthead">
+
+
+        <h4 style="color: red">欢迎您， {{ user }} &nbsp;<a href="">注销</a></h4>
+
+    </div>
+
+
+    <div>
+
+
+        <div class="text-center">
+
+
+            <div>
+
+                <br>
+
+            </div>
+
+            <div style="width:100%;">
+
+
+                <table class="table text-left">
+
+                    <thead>
+
+                    <tr class="alert alert-success">
+
+                        <strong>
+                            <th>Email</th>
+
+                            <th>姓名</th>
+
+                            <th>密码</th>
+
+                            <th>手机号码</th>
+
+                            <th>身份</th>
+
+                            <th>性别</th>
+
+                            <th>头像</th>
+
+                            <th>用户签名</th>
+
+                            <th>操作</th>
+
+                        </strong>
+
+                    </tr>
+
+                    </thead>
+
+                    <thead>
+
+                    {% for auser in users.all %}
+
+                        <tr class="alert-info">
+
+                            <td>{{ auser.userEmail }}</td>
+
+                            <td>{{ auser.username }}</td>
+
+                            <td> {{ auser.userPassword }}</td>
+
+                            <td> {{ auser.userPhone }}</td>
+
+                            <td> {{ auser.userIdentity }}</td>
+
+                            <td> {{ auser.userSex }}</td>
+
+                            <td> {{ auser.userAvatar }}</td>
+
+                             <td> {{ auser.userSignature }}</td>
+
+                            <td>
+
+                                <strong><a href="#">修改</a></strong>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </thead>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <div>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

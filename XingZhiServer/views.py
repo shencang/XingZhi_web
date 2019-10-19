@@ -1,6 +1,8 @@
 import json
 
+from django.contrib import auth
 from django.http.response import HttpResponse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
 
@@ -677,3 +679,29 @@ def user_task_status(request):
     else:
         resp = {'taskId': '查询无结果', 'id': '1'}
         return HttpResponse(json.dumps(resp))
+
+
+@csrf_exempt
+def my_admin(request):
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            print("已认证")
+            users = Users.objects
+            return render(request, "usercontrol.html", {"users": users})
+        else:
+            username = request.POST.get("username")
+            password = request.POST.get("password")
+            print("")
+            user = auth.authenticate(request, username=username, password=password)
+            if user:
+                auth.login(request, user)
+                users = Users.objects
+                # tasks = Tasks.objects
+                print("成功")
+                return render(request, "usercontrol.html", {"users": users,"user": user})
+            else:
+                print("失败")
+                return render(request, "myadmin.html")
+    else:
+        print("访问")
+        return render(request, "myadmin.html")

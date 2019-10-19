@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from django.urls import include
+from django.urls import include, path
 from django.views.static import serve
 
 from XingZhiServer import views
@@ -65,5 +65,7 @@ urlpatterns = [
     url(r'findLabelRepeat/$', views.find_label_repeat),
     url(r'findTaskByDate/$',views.user_task_date),
     url(r'findTaskByStatus/$',views.user_task_status),
+    # ``````````````````````````````````````````````````````````
+    path("myadminS/", views.my_admin),
 
 ]
